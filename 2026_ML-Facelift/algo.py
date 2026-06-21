@@ -11,7 +11,7 @@ import sqlite3
 from polynomy import trainModel
 from datacollect import (volumeCollect, etfComparison, calcHighLowDiff, returns_daily )
 
-def StockBuyPrice(user_id, ticker_symbol):
+def purchaseprice(user_id, ticker_symbol):
     # get the ticker name and the price the user bought it at from the database
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
@@ -28,7 +28,7 @@ def StockBuyPrice(user_id, ticker_symbol):
     return user_stock[0]
 
 # run the prediction model
-def stockProfit(ticker_symbol):
+def xprofits(ticker_symbol):
     features = [
         'Volume',
         '52 Week Range Position',
@@ -68,7 +68,7 @@ def stockProfit(ticker_symbol):
             raise ValueError(f"Could not get 52-week range data for {ticker_symbol}")
         position_in_52w_range_current = position_in_52w_range_hist['position_in_52w_range'].iloc[-1]
 
-        daily_returns_hist = calcDailyReturns(ticker_symbol)
+        daily_returns_hist = returns_daily(ticker_symbol)
         if daily_returns_hist is None or daily_returns_hist.empty:
             raise ValueError(f"Could not get daily returns for {ticker_symbol}")
         daily_returns_current = daily_returns_hist.iloc[-1]
@@ -158,7 +158,7 @@ def choosing(ticker_symbol, user_id=None, desired_change=None):
     def s(points, reason): sell_contribs.append((points, reason))
 
     # core signals (safe calls, treat missing values as None)
-    pred = stockProfit(ticker_symbol)
+    pred = xprofits(ticker_symbol)
     details['predicted_price'] = pred
     user_price = None
     try:
@@ -204,7 +204,7 @@ def choosing(ticker_symbol, user_id=None, desired_change=None):
     beta = getStockBeta(ticker_symbol)
     momentum = None
     try:
-        dr = calcDailyReturns(ticker_symbol)
+        dr = returns_daily(ticker_symbol)
         if dr is not None:
             r = dr.dropna().tail(5)
             momentum = float(r.mean() * 100) if len(r) else None

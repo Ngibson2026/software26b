@@ -10,12 +10,12 @@ from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 from sklearn.linear_model import LinearRegression, Ridge
 from sklearn.metrics import mean_absolute_error, r2_score
 
-from yfCollectData import stockDataCollection
+from datacollect import stockdatafetcher
 
 plt.style.use('ggplot')
 
 def trainModel(ticker_symbol):
-    training_data = stockDataCollection(ticker_symbol) # gets training data from the yfCollectData subroutine
+    training_data = stockdatafetcher(ticker_symbol) # gets training data from the yfCollectData subroutine
 
     X = training_data[['Volume', '52 Week Range Position', 'Top Sector ETF Close', 'Daily Returns']] # Sets features
     y = training_data[['Close']] # Sets what we're predicting to be the close value of the stock

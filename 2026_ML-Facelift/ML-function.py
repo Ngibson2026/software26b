@@ -1,8 +1,8 @@
-import yfinance as yf
+from yfinance import Ticker
 
-def stockdatacollection(ticker):
+def stockdatafetcher(ticker):
     stockdata = {}
-    ticker = yf.Ticker(ticker)
+    ticker = Ticker(ticker)
     try:
         info = ticker.info
         hist = ticker.history(period="3mo")
@@ -19,4 +19,4 @@ def stockdatacollection(ticker):
         print(f"error fetching {ticker}: {e}")
         return None, None, F"failed to fetch data for {ticker}"
 
-stockdatacollection('GYG.AX')
+stockdatafetcher('NVDA')

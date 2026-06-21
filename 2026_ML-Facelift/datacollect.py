@@ -10,7 +10,7 @@ def returns_daily(ticker_symbol):
 
     try:
         stock = yf.Ticker(ticker)  # establishes ticker
-        hist = stock.history(period="5y") # gets 5 year history
+        hist = stock.history(period="5y") # past 5-years
 
         daily_returns = hist['Close'].pct_change()
         return daily_returns
@@ -72,7 +72,7 @@ def volumeCollect(ticker_symbol):
         print(e)
         return None
 
-def stockDataCollection(ticker_symbol):
+def stockdatafetcher(ticker_symbol):
     if not ticker_symbol or len(ticker_symbol.strip()) < 1:  # if ticker name is too short
         return None
     ticker = ticker_symbol.upper().strip()
