@@ -1,0 +1,16 @@
+flask
+flask_login
+werkzeug
+bleach
+logging
+email_validator
+flask_wtf
+wtforms
+contextlib2
+yfinance
+dotenv
+datetime
+plotly
+zxcvbn
+python-dotenv
+zxcvbn-dutch
