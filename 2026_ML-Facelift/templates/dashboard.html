@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Smart Study{% endblock %}
+{% block heading %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary shadow">
+                <div class="card-body">
+                    <h5>Cash Balance</h5>
+                    <h3>${{ cash_balance | default(0) | round(2) }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success shadow">
+                <div class="card-body">
+                    <h5>Portfolio Value</h5>
+                    <h3>${{ portfolio_value | default(0) | round(2) }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow" style="background-color: {% if overall_return >= 0 %}#d4edda{% else %}#f8d7da{% endif %};">
+                <div class="card-body">
+                    <h6>Overall Return</h6>
+                    <h3 class="{% if overall_return >= 0 %}text-success{% else %}text-danger{% endif %}">
+                        {{ overall_return }}%
+                    </h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow" style="background-color: {% if total_unrealized_pnl >= 0 %}#d4edda{% else %}#f8d7da{% endif %};">
+                <div class="card-body">
+                    <h5>Total P&L</h5>
+                    <h3 class="{% if total_unrealized_pnl >= 0 %}text-success{% else %}text-danger{% endif %}">
+                        ${{ total_unrealized_pnl | default(0) | round(2) }}
+                    </h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Gainer & Top Loser -->
+    <div class="row mb-4">
+        {% if top_gainer and top_gainer.unrealized_pnl > 0 %}
+        <div class="col-md-6">
+            <div class="card border-success">
+                <div class="card-body">
+                    <h6 class="text-success">Top Gainer</h6>
+                    <h5>{{ top_gainer.ticker }}</h5>
+                    <p class="mb-0 text-success">
+                        +${{ top_gainer.unrealized_pnl | round(2) }} ({{ top_gainer.pnl_percent }}%)
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if top_loser and top_loser.unrealized_pnl < 0 %}
+        <div class="col-md-6">
+            <div class="card border-danger">
+                <div class="card-body">
+                    <h6 class="text-danger">Top Loser</h6>
+                    <h5>{{ top_loser.ticker }}</h5>
+                    <p class="mb-0 text-danger">
+                        ${{ top_loser.unrealized_pnl | round(2) }} ({{ top_loser.pnl_percent }}%)
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Asset Allocation Pie Chart -->
+    {% if portfolio_value > 0 %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5>Asset Allocation</h5>
+                </div>
+                <div class="card-body">
+                    {{ allocation_chart | safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Holdings Table -->
+    <h4 class="mb-3">Your Portfolio Holdings</h4>
+
+    {% if holdings %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Ticker</th>
+                    <th class="text-end">Shares Owned</th>
+                    <th class="text-end">Avg Buy Price</th>
+                    <th class="text-end">Current Price</th>
+                    <th class="text-end">Market Value</th>
+                    <th class="text-end">Unrealized P&L</th>
+                    <th class="text-end">% Return</th>
+                    <th class="text-center">Sell Shares</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for holding in holdings %}
+                <tr>
+                    <td><strong>{{ holding.ticker }}</strong></td>
+                    <td class="text-end">{{ holding.shares }}</td>
+                    <td class="text-end">${{ holding.avg_buy_price }}</td>
+                    <td class="text-end">
+                        {% if holding.current_price %}${{ holding.current_price }}{% else %}N/A{% endif %}
+                    </td>
+                    <td class="text-end">
+                        {% if holding.market_value %}${{ holding.market_value }}{% else %}—{% endif %}
+                    </td>
+                    <td class="text-end {% if holding.unrealized_pnl >= 0 %}text-success{% else %}text-danger{% endif %}">
+                        {% if holding.unrealized_pnl is not none %}${{ holding.unrealized_pnl }}{% else %}—{% endif %}
+                    </td>
+                    <td class="text-end {% if holding.pnl_percent >= 0 %}text-success{% else %}text-danger{% endif %}">
+                        {% if holding.pnl_percent is not none %}{{ holding.pnl_percent }}%{% else %}—{% endif %}
+                    </td>
+
+                    <!-- Sell Options -->
+                    <td>
+                        <div class="d-flex gap-2 justify-content-center">
+                            <!-- Partial Sell Form -->
+                            <form method="POST" action="{{ url_for('sell_stock') }}" class="d-inline-flex align-items-center gap-1">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="ticker" value="{{ holding.ticker }}">
+                                <input type="number"
+                                       name="shares"
+                                       min="1"
+                                       max="{{ holding.shares }}"
+                                       value="1"
+                                       class="form-control form-control-sm"
+                                       style="width: 85px;"
+                                       required>
+                                <button type="submit"
+                                        class="btn btn-sm btn-outline-danger">
+                                    Sell
+                                </button>
+                            </form>
+
+                            <!-- Sell All Button -->
+                            <form method="POST" action="{{ url_for('sell_stock') }}" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="ticker" value="{{ holding.ticker }}">
+                                <input type="hidden" name="shares" value="{{ holding.shares }}">
+                                <button type="submit"
+                                        class="btn btn-sm btn-danger"
+                                        onclick="return confirm('Sell ALL {{ holding.shares }} shares of {{ holding.ticker }}? This action cannot be undone.')">
+                                    Sell All
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <div class="alert alert-info">
+            You don't own any stocks yet.
+            <a href="{{ url_for('quote_stock') }}">Search for stocks to buy →</a>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+{% endblock %}

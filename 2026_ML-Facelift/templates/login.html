@@ -1,0 +1,70 @@
+{% extends 'base.html' %}   
+{% block title %}Login - Smart Signal{% endblock %}
+{% block heading %}Login{% endblock %}
+{% block content %}
+    <!--
+    <form method="POST" action="{{ url_for('login') }}">
+        {{ form.csrf_token }}-->
+        <!--<p>username
+        <input type="text" name="username" placeholder="Username" required></p>
+        <p>password
+        <input type="password" name="password" placeholder="Password" required></p>
+        <button type="submit">Submit</button>-->
+
+        <!--WTForms
+        <p>Username {{ form.username() }}</p>
+        <p>Password {{ form.password() }}</p>
+        <p>{{ form.submit }}</p>
+
+    </form>-->
+
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white text-center">
+                    <h4>Welcome to Smart Signal</h4>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted text-center mb-4">Sign in to access your portfolio</p>
+
+                    <form method="POST" action="{{ url_for('login') }}" novalidate>
+                        {{ form.csrf_token }}
+
+                        <div class="mb-3">
+                            {{ form.username.label(class="form-label") }}
+                            {{ form.username(class="form-control", placeholder="Enter your username") }}
+                            {% if form.username.errors %}
+                                {% for error in form.username.errors %}
+                                    <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.password.label(class="form-label") }}
+                            {{ form.password(class="form-control", placeholder="Enter your password") }}
+                            {% if form.password.errors %}
+                                {% for error in form.password.errors %}
+                                    <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        {{ form.submit(class="btn btn-primary btn-lg") }}
+                    </form>
+
+                    <!-- Links -->
+                    <div class="text-center">
+                        <p class="mb-1">
+                            Don't have an account?
+                            <a href="{{ url_for('register') }}" class="text-decoration-none">Register here</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+

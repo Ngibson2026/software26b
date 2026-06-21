@@ -1,0 +1,123 @@
+{% extends 'base.html' %}   
+{% block title %}View Progress - Smart Signal{% endblock %}
+{% block heading %}View Progress{% endblock %}
+{% block content %}
+    <!-- OLD with WTForms
+    {% if posts %}
+        <table>
+            <tr>
+                <th>Date</th>
+                <th>Title</th>
+                <th>Details</th>
+                <th>Image</th>
+            </tr>
+        {% for post in posts %}
+            <tr>
+                <td>{{ post.date }}</td>
+                <td>{{ post.title }}</td>
+                <td>{{ post.details }}</td>                
+                <td>
+                    {% if post.image_path %}
+                        <img src="{{ url_for('static', filename=post.image_path) }}" 
+                            alt="Progress Image" 
+                            width="150">
+                    {% else %}
+                        No image
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </table>
+    {% else %}
+        <p>No progress entries found.</p>
+    {% endif %}
+    -->
+
+    <div class="container mt-4">
+
+    {% if posts %}
+        <div class="row">
+            {% for post in posts %}
+            <div class="col-12 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+
+                        <!-- Title + Date -->
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h5 class="card-title mb-0">{{ post.title }}</h5>
+                            <small class="text-muted">{{ post.date }}</small>
+                        </div>
+
+                        <!-- Main Content Row -->
+                        <div class="row align-items-start">
+
+                            <!-- Text Column - Made wider -->
+                            <div class="{% if post.image_path %}col-md-9{% else %}col-12{% endif %}">
+                                <p class="card-text">{{ post.details | safe }}</p>
+                            </div>
+
+                            <!-- Image Column - Tighter spacing -->
+                            {% if post.image_path %}
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <a href="#"
+                                       onclick="showImage('{{ url_for('static', filename=post.image_path) }}', '{{ post.title }}'); return false;">
+                                        <img src="{{ url_for('static', filename=post.image_path) }}"
+                                             class="img-fluid rounded shadow-sm"
+                                             alt="Supporting image"
+                                             style="max-height: 320px;
+                                                    object-fit: contain;
+                                                    cursor: pointer;
+                                                    border: 1px solid #ddd;">
+                                    </a>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                    </div>
+                    <div class="card-footer text-muted small">
+                        Entry #{{ post.id }}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <h4>No Progress Entries Yet</h4>
+            <p class="text-muted">You haven't added any progress logs yet.</p>
+            <a href="{{ url_for('add_progress') }}" class="btn btn-primary btn-lg mt-3">
+                Add Your First Progress Log
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Image Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalImageTitle">Progress Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-3">
+                <img id="modalImage" src="" class="img-fluid rounded" alt="Full size image" style="max-height: 85vh;">
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function showImage(imageSrc, title) {
+    document.getElementById('modalImage').src = imageSrc;
+    document.getElementById('modalImageTitle').textContent = title || 'Progress Image';
+
+    const modal = new bootstrap.Modal(document.getElementById('imageModal'));
+    modal.show();
+}
+</script>
+{% endblock %}

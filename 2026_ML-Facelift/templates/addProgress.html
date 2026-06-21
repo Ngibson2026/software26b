@@ -1,0 +1,113 @@
+{% extends 'base.html' %}   
+{% block title %}Add Progress - Smart Signal{% endblock %}
+{% block heading %}Add Progress{% endblock %}
+{% block content %}
+    <!--
+    OLD
+    <p> Enter your details to add progress </p>
+    <form method="POST" action="{{ url_for('add_progress') }}" enctype="multipart/form-data">
+        {{ form.csrf_token }}-->
+        <!--
+        <p>Date
+        <input type="date" name="date" required></p>
+        <p>Title
+        <input type="text" name="title" placeholder="Title" required></p>
+        <p>Details
+        <input type="text" name="details" placeholder="Details" required></p>
+        <p>Image
+        <input type="file" name="image" accept="image/*"></p>-->
+        
+        <!-- utilise CSRF fields from forms.py-->
+
+        <!-- WTForms with CSRF
+        <p>Date {{ form.date() }}</p>
+        <p>Title {{ form.title() }}</p>
+        <p>Details {{ form.details() }}</p>
+        <p>Image {{ form.image() }}</p>
+        <p>{{ form.submit }}</p>
+        -->
+        <!--<button type="submit">Post Progress</button>
+    </form>-->
+
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white text-center">
+                    <h4>New Progress Entry</h4>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted text-center mb-4">
+                        Record your study progress or achievements
+                    </p>
+
+                    <form method="POST"
+                          action="{{ url_for('add_progress') }}"
+                          enctype="multipart/form-data"
+                          novalidate>
+                        {{ form.csrf_token }}
+
+                        <!-- Date Field -->
+                        <div class="mb-3">
+                            {{ form.date.label(class="form-label") }}
+                            {{ form.date(class="form-control") }}
+                            {% if form.date.errors %}
+                                {% for error in form.date.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <!-- Title Field -->
+                        <div class="mb-3">
+                            {{ form.title.label(class="form-label") }}
+                            {{ form.title(class="form-control", placeholder="e.g. Completed Chapter 5 - Python Functions") }}
+                            {% if form.title.errors %}
+                                {% for error in form.title.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <!-- Details Field -->
+                        <div class="mb-3">
+                            {{ form.details.label(class="form-label") }}
+                            {{ form.details(class="form-control",
+                                           rows="6",
+                                           placeholder="Describe what you learned, challenges faced, or achievements...") }}
+                            {% if form.details.errors %}
+                                {% for error in form.details.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <!-- Image Field -->
+                        <div class="mb-3">
+                            {{ form.image.label(class="form-label") }}
+                            {{ form.image(class="form-control") }}
+                            {% if form.image.errors %}
+                                {% for error in form.image.errors %}
+                                    <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid gap-2">
+                            {{ form.submit(class="btn btn-success btn-lg") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Helpful tip -->
+            <div class="text-center mt-3">
+                <small class="text-muted">
+                    Tip: Be specific in your details — it helps track your long-term progress!
+                </small>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
